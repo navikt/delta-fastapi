@@ -1,0 +1,7 @@
+.env
+.env.docker
+.idea
+.venv
+.DS_Store
+*.pyc
+__pycache__/
