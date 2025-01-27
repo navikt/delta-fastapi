@@ -1,0 +1,62 @@
+from fastapi import APIRouter, Depends, HTTPException, Security
+from sqlalchemy.orm import Session
+from typing import List
+import uuid
+
+from app.database import get_db
+from app.auth import VerifyOauth2Token
+from .schemas import Group, GroupCreate
+from .models import Group as GroupModel, Member as MemberModel  # Updated import
+
+router = APIRouter()
+
+# Initialize token verification
+token_verification = VerifyOauth2Token()
+
+@router.post("/groups", response_model=Group, tags=["Groups"])
+def create_group(
+    group: GroupCreate, 
+    db: Session = Depends(get_db), 
+    token: dict = Security(token_verification.verify)
+):
+    db_group = GroupModel(**group.dict())
+    db.add(db_group)
+    db.commit()
+    db.refresh(db_group)
+
+    # Add owner to members table
+    owner_email = token.get("email", "local@email.no")
+    owner_name = token.get("preferred_username", "local_user")
+    if not owner_email or not owner_name:
+        raise HTTPException(status_code=400, detail="Token does not contain required user information.")
+
+    db_member = MemberModel(
+        member_id=uuid.uuid4(),
+        group_id=db_group.group_id,
+        email=owner_email,
+        name=owner_name,
+        role="owner"
+    )
+    db.add(db_member)
+    db.commit()
+    db.refresh(db_member)
+
+    return db_group
+
+@router.get("/groups", response_model=List[Group], tags=["Groups"])
+def get_groups(
+    db: Session = Depends(get_db), 
+    token: dict = Security(token_verification.verify)
+):
+    return db.query(GroupModel).all()
+
+@router.get("/groups/{group_id}", response_model=Group, tags=["Groups"])
+def get_group(
+    group_id: uuid.UUID, 
+    db: Session = Depends(get_db), 
+    token: dict = Security(token_verification.verify)
+):
+    group = db.query(GroupModel).filter(GroupModel.group_id == group_id).first()
+    if group is None:
+        raise HTTPException(status_code=404, detail="Group not found")
+    return group

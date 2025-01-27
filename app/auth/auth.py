@@ -44,7 +44,7 @@ class VerifyOauth2Token:
     ) -> dict[str, Any]:
         if self.skip_auth:
             # logger.info("Autentiseringskontroll omgått på grunn av SKIP_AUTH=true")
-            return {"preferred_username": "local_user"}
+            return {"preferred_username": "local_user", "email": "local@email.no"}
 
         # Definerer en HTTPException for uautentisert tilgang
         unauthenticated_exception = HTTPException(
@@ -83,5 +83,9 @@ class VerifyOauth2Token:
         except jwt.InvalidTokenError:
             logger.exception("Kunne ikke validere akkreditering")
             raise unauthenticated_exception
+
+        # Ensure email is present in the payload
+        if "email" not in payload:
+            payload["email"] = "local@email.no"
 
         return payload
