@@ -7,7 +7,7 @@ from app.config.logger import logger
 from app.database import get_db
 from app.auth import VerifyOauth2Token
 from .schemas import Group, GroupCreate
-from .models import Group as GroupModel, Member as MemberModel
+from .models import Group as GroupModel, Member as MemberModel, GroupUpdate  # Add GroupUpdate import
 
 router = APIRouter()
 
@@ -42,6 +42,21 @@ def create_group(
         db.add(db_member)
         db.commit()
         db.refresh(db_member)
+
+        # Add entry to group_updates table
+        try:
+            db_group_update = GroupUpdate(
+                update_id=uuid.uuid4(),
+                group_id=db_group.group_id,
+                updated_by=db_member.member_id,
+                update_details=f"Opprettet gruppe: {db_group.name}"
+            )
+            db.add(db_group_update)
+            db.commit()
+            db.refresh(db_group_update)
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Kunne ikke legge til oppdatering i group_updates: {e}")
 
         return db_group
     except Exception as e:

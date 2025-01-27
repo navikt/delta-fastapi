@@ -50,3 +50,12 @@ class Member(Base):
     name = Column(String, nullable=False)
     role = Column(String, default="member", nullable=False)
     joined_at = Column(DateTime, default=datetime.utcnow)
+
+class GroupUpdate(Base):
+    __tablename__ = "group_updates"
+
+    update_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    group_id = Column(UUID(as_uuid=True), nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    updated_by = Column(UUID(as_uuid=True), nullable=False)
+    update_details = Column(String, nullable=False)

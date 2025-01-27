@@ -24,7 +24,8 @@ CREATE TABLE group_updates (
     update_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     group_id UUID NOT NULL REFERENCES groups(group_id) ON DELETE CASCADE,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_by UUID
+    updated_by UUID,
+    update_details TEXT NOT NULL  -- Add this line to store what update happened
 );
 
 -- Create Members table
