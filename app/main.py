@@ -4,7 +4,7 @@ from app.config import configure_cors, configure_database, configure_exceptions,
 
 app = FastAPI()
 
-# Router
+# Routere legges til i /app/routers/__init__.py
 include_routers(app)
 
 # Konfig

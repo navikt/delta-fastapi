@@ -3,10 +3,11 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Any, Dict
 from datetime import datetime
 from pydantic import UUID4
+
 from app.config.logger import logger
 from app.database import get_db
-from app.routers.apps.models import Apps
-from app.routers.apps.schemas import AppsModel, AppsResponseModel, AppsUpdateModel
+from .models import Apps
+from .schemas import AppsModel, AppsResponseModel, AppsUpdateModel
 from app.auth import VerifyOauth2Token
 
 router = APIRouter()

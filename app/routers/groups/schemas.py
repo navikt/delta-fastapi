@@ -23,9 +23,8 @@ class GroupCreate(GroupBase):
 class Group(GroupBase):
     group_id: uuid.UUID
     created_at: datetime
-
     class Config:
-        orm_mode = True
+        from_attributes = True
         json_encoders = {
             time: lambda v: v.strftime('%H:%M:%S') if v else None,
             datetime: lambda v: v.isoformat() if v else None,
