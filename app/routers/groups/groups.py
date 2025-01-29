@@ -14,7 +14,7 @@ router = APIRouter()
 # Initialize token verification
 token_verification = VerifyOauth2Token()
 
-@router.post("/groups", response_model=Group, tags=["Groups"])
+@router.post("/api/groups", response_model=Group, tags=["Groups"])
 def create_group(
     group: GroupCreate, 
     db: Session = Depends(get_db), 
@@ -64,14 +64,14 @@ def create_group(
         logger.error(f"Kunne ikke legge til gruppe: {e}")
         raise HTTPException(status_code=500, detail="Kunne ikke legge til gruppe")
 
-@router.get("/groups", response_model=List[Group], tags=["Groups"])
+@router.get("/api/groups", response_model=List[Group], tags=["Groups"])
 def get_groups(
     db: Session = Depends(get_db), 
     token: dict = Security(token_verification.verify)
 ):
     return db.query(GroupModel).all()
 
-@router.get("/groups/{group_id}", response_model=Group, tags=["Groups"])
+@router.get("/api/groups/{group_id}", response_model=Group, tags=["Groups"])
 def get_group(
     group_id: uuid.UUID, 
     db: Session = Depends(get_db), 

@@ -9,7 +9,7 @@ class GroupBase(BaseModel):
     description: Optional[str] = None
     group_type: str
     is_regular_meeting: bool
-    meeting_frequency: str
+    meeting_frequency: Optional[str] = None
     default_meeting_start: Optional[time] = None
     default_meeting_end: Optional[time] = None
     has_private_slack: bool = False
