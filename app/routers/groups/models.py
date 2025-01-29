@@ -14,7 +14,7 @@ class Group(Base):
     description = Column(String)
     group_type = Column(String, nullable=False)
     is_regular_meeting = Column(Boolean, default=False, nullable=False)
-    meeting_frequency = Column(String, nullable=False)
+    meeting_frequency = Column(String, nullable=True)
     default_meeting_start = Column(Time)
     default_meeting_end = Column(Time)
     has_private_slack = Column(Boolean, default=False)
