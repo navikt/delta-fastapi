@@ -26,9 +26,9 @@ def create_group(
         db.commit()
         db.refresh(db_group)
 
-        # Add owner to members table
-        owner_email = token.get("email", "local@email.no")
-        owner_name = token.get("preferred_username", "local_user")
+        # Get user info from token
+        owner_email = token.get("preferred_username", "local@email.no")
+        owner_name = token.get("name", "Local User")
         if not owner_email or not owner_name:
             raise HTTPException(status_code=400, detail="Token does not contain required user information.")
 
