@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import uuid
 from datetime import time, datetime
 
@@ -20,9 +20,19 @@ class GroupBase(BaseModel):
 class GroupCreate(GroupBase):
     pass
 
+class Owner(BaseModel):
+    email: str
+    name: str
+    role: str
+
+    class Config:
+        from_attributes = True
+
 class Group(GroupBase):
     group_id: uuid.UUID
     created_at: datetime
+    owners: List[Owner] = []
+
     class Config:
         from_attributes = True
         json_encoders = {

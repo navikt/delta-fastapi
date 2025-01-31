@@ -69,7 +69,17 @@ def get_groups(
     db: Session = Depends(get_db), 
     token: dict = Security(token_verification.verify)
 ):
-    return db.query(GroupModel).all()
+    groups = db.query(GroupModel).all()
+    
+    # Add owners to each group
+    for group in groups:
+        owners = db.query(MemberModel).filter(
+            MemberModel.group_id == group.group_id,
+            MemberModel.role.in_(["owner", "coowner"])
+        ).all()
+        group.owners = [{"email": owner.email, "name": owner.name, "role": owner.role} for owner in owners]
+    
+    return groups
 
 @router.get("/api/groups/{group_id}", response_model=Group, tags=["Groups"])
 def get_group(
