@@ -90,4 +90,12 @@ def get_group(
     group = db.query(GroupModel).filter(GroupModel.group_id == group_id).first()
     if group is None:
         raise HTTPException(status_code=404, detail="Group not found")
+    
+    # Add owners to the group
+    owners = db.query(MemberModel).filter(
+        MemberModel.group_id == group_id,
+        MemberModel.role.in_(["owner", "coowner"])
+    ).all()
+    group.owners = [{"email": owner.email, "name": owner.name, "role": owner.role} for owner in owners]
+    
     return group
