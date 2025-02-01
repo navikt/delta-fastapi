@@ -99,3 +99,23 @@ def get_group(
     group.owners = [{"email": owner.email, "name": owner.name, "role": owner.role} for owner in owners]
     
     return group
+
+@router.get("/api/groups/{group_id}/is-owner", tags=["Groups"])
+def check_if_owner(
+    group_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    token: dict = Security(token_verification.verify)
+):
+    # Get user email from token
+    user_email = token.get("preferred_username")
+    if not user_email:
+        raise HTTPException(status_code=400, detail="Token does not contain email")
+
+    # Check if user is owner/co-owner
+    member = db.query(MemberModel).filter(
+        MemberModel.group_id == group_id,
+        MemberModel.email == user_email,
+        MemberModel.role.in_(["owner", "coowner"])
+    ).first()
+
+    return {"isOwner": member is not None}
