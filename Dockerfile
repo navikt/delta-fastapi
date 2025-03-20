@@ -1,24 +1,17 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.11-slim
+FROM debian:12-slim AS build
+RUN apt-get update && \
+    apt-get install --no-install-suggests --no-install-recommends --yes python3-venv gcc libpython3-dev && \
+    python3 -m venv /venv && \
+    /venv/bin/pip install --upgrade pip setuptools wheel
 
-# Install required system libraries
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libffi-dev \
-    gcc \
-    && apt-get clean
+# Build the virtualenv as a separate step: Only re-execute this step when requirements.txt changes
+FROM build AS build-venv
+COPY requirements.txt /requirements.txt
+RUN /venv/bin/pip install --disable-pip-version-check -r /requirements.txt
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the requirements file into the container
-COPY requirements.txt .
-
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the application code and other necessary files into the container
-COPY app/ ./app/
-
-# Command to run the FastAPI app using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8087"]
+# Copy the virtualenv into a distroless image
+FROM gcr.io/distroless/python3-debian12
+COPY --from=build-venv /venv /venv
+COPY app/ /app/
+COPY main.py /main.py
+ENTRYPOINT ["/venv/bin/python3", "main.py"]
