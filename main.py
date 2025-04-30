@@ -12,3 +12,10 @@ configure_cors(app)
 configure_database(app)
 configure_exceptions(app)
 configure_openapi(app)
+
+if __name__ == "__main__":
+    uvicorn.run(
+        api,
+        host="0.0.0.0",
+        port=8087
+    )
