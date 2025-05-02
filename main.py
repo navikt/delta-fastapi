@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routers import include_routers
 from app.config import configure_cors, configure_database, configure_exceptions, configure_openapi
+import uvicorn
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ configure_openapi(app)
 
 if __name__ == "__main__":
     uvicorn.run(
-        api,
+        app,
         host="0.0.0.0",
         port=8087
     )
